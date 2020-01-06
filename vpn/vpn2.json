@@ -1,0 +1,483 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location1": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region"
+      }
+    },
+    "location2": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region"
+      }
+    },
+    "gateway1PublicIP1Name": {
+      "type": "string",
+      "defaultValue": "vpnGw1IP1",
+      "metadata": {
+        "description": "Arbitrary name for public IP1 resource used for the new azure gateway1"
+      }
+    },
+    "gateway2PublicIP1Name": {
+      "type": "string",
+      "defaultValue": "vpnGw2IP1",
+      "metadata": {
+        "description": "Arbitrary name for public IP1 resource used for the new azure gateway2"
+      }
+    },
+    "gateway1PublicIP2Name": {
+      "type": "string",
+      "defaultValue": "vpnGw1IP2",
+      "metadata": {
+        "description": "Arbitrary name for public IP2 resource used for the new azure gateway1"
+      }
+    },
+    "gateway2PublicIP2Name": {
+      "type": "string",
+      "defaultValue": "vpnGw2IP2",
+      "metadata": {
+        "description": "Arbitrary name for public IP2 resource used for the new azure gateway2"
+      }
+    },
+    "gateway1Name": {
+      "type": "string",
+      "defaultValue": "vpnGw1",
+      "metadata": {
+        "description": "Arbitrary name for the new gateway"
+      }
+    },
+    "gateway2Name": {
+      "type": "string",
+      "defaultValue": "vpnGw2",
+      "metadata": {
+        "description": "Arbitrary name for the new gateway"
+      }
+    },
+    "localGateway1Name1": {
+      "type": "string",
+      "defaultValue": "localGateway11",
+      "metadata": {
+        "description": "Arbitrary name for gateway resource representing VPN gateway2"
+      }
+    },
+    "localGateway1Name2": {
+      "type": "string",
+      "defaultValue": "localGateway12",
+      "metadata": {
+        "description": "Arbitrary name for gateway resource representing VPN gateway2"
+      }
+    },
+    "localGateway2Name1": {
+      "type": "string",
+      "defaultValue": "localGateway21",
+      "metadata": {
+        "description": "Arbitrary name for gateway resource representing VPN gateway1"
+      }
+    },
+    "localGateway2Name2": {
+      "type": "string",
+      "defaultValue": "localGateway22",
+      "metadata": {
+        "description": "Arbitrary name for gateway resource representing VPN gateway1"
+      }
+    },
+    "asnGtw1": {
+      "type": "int",
+      "defaultValue": 65010,
+      "metadata": {
+        "description": "BGP Autonomous System Number of the VNet"
+      }
+    },
+    "asnGtw2": {
+      "type": "int",
+      "defaultValue": 65020,
+      "metadata": {
+        "description": "BGP Autonomous System Number of the remote VNet"
+      }
+    },
+    "connection1Name1": {
+      "type": "string",
+      "defaultValue": "gtw1-to-gtw2-1",
+      "metadata": {
+        "description": "Arbitrary name for the new connection between Azure VNet and other network"
+      }
+    },
+    "connection1Name2": {
+      "type": "string",
+      "defaultValue": "gtw1-to-gtw2-2",
+      "metadata": {
+        "description": "Arbitrary name for the new connection between Azure VNet and other network"
+      }
+    },
+    "connection2Name1": {
+      "type": "string",
+      "defaultValue": "gtw2-to-gtw1-1",
+      "metadata": {
+        "description": "Arbitrary name for the new connection between Azure VNet and other network"
+      }
+    },
+    "connection2Name2": {
+      "type": "string",
+      "defaultValue": "gtw2-to-gtw1-2",
+      "metadata": {
+        "description": "Arbitrary name for the new connection between Azure VNet and other network"
+      }
+    },
+    "sharedKey": {
+      "type": "string",
+      "defaultValue": "secretPSK-101",
+      "metadata": {
+        "description": "Shared key (PSK) for IPSec tunnel"
+      }
+    }
+  },
+  "variables": {
+    "location1": "[parameters('location1')]",
+    "location2": "[parameters('location2')]",
+    "gateway1Name": "[parameters('gateway1Name')]",
+    "gateway2Name": "[parameters('gateway2Name')]",
+    "localGateway1Name1": "[parameters('localGateway1Name1')]",
+    "localGateway1Name2": "[parameters('localGateway1Name2')]",
+    "localGateway2Name1": "[parameters('localGateway2Name1')]",
+    "localGateway2Name2": "[parameters('localGateway2Name2')]",
+    "gateway1PublicIP1Name": "[parameters('gateway1PublicIP1Name')]",
+    "gateway1PublicIP2Name": "[parameters('gateway1PublicIP2Name')]",
+    "gateway2PublicIP1Name": "[parameters('gateway2PublicIP1Name')]",
+    "gateway2PublicIP2Name": "[parameters('gateway2PublicIP2Name')]",
+    "asnGtw1": "[parameters('asnGtw1')]",
+    "asnGtw2": "[parameters('asnGtw2')]",
+    "connection1Name1": "[parameters('connection1Name1')]",
+    "connection1Name2": "[parameters('connection1Name2')]",
+    "connection2Name1": "[parameters('connection2Name1')]",
+    "connection2Name2": "[parameters('connection2Name2')]",
+    "sharedKey": "[parameters('sharedKey')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "name": "[variables('localGateway1Name1')]",
+      "apiVersion": "2019-06-01",
+      "comments": "public IP of remote IPSec peer",
+      "location": "[variables('location1')]",
+      "properties": {
+        "gatewayIpAddress": "[variables('gateway2PubIP1')]",
+        "bgpSettings": {
+          "asn": "[variables('asnGtw2')]",
+          "bgpPeeringAddress":   "[first(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway2Name'))).bgpSettings.bgpPeeringAddress , ','))]",
+          "peerWeight": 0
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "name": "[variables('localGateway1Name2')]",
+      "apiVersion": "2019-06-01",
+      "comments": "public IP of remote IPSec peer",
+      "location": "[variables('location1')]",
+      "properties": {
+        "gatewayIpAddress": "[variables('gateway2PubIP2')]",
+        "bgpSettings": {
+          "asn": "[variables('asnGtw2')]",
+          "bgpPeeringAddress":   "[last(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway2Name'))).bgpSettings.bgpPeeringAddress , ','))]",
+          "peerWeight": 0
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "name": "[variables('localGateway2Name1')]",
+      "apiVersion": "2019-06-01",
+      "comments": "public IP of remote IPSec peer",
+      "location": "[variables('location2')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses',variables('gateway1PublicIP1Name'))]"
+      ],
+      "properties": {
+        "gatewayIpAddress": "[variables('gateway1PubIP1')]",
+        "bgpSettings": {
+          "asn": "[variables('asnGtw1')]",
+          "bgpPeeringAddress": "[first(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway1Name'))).bgpSettings.bgpPeeringAddress , ','))]",
+          "peerWeight": 0
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "name": "[variables('localGateway2Name2')]",
+      "apiVersion": "2019-06-01",
+      "comments": "public IP of remote IPSec peer",
+      "location": "[variables('location2')]",
+      "properties": {
+        "gatewayIpAddress": "[variables('gateway1PubIP2')]",
+        "bgpSettings": {
+          "asn": "[variables('asnGtw1')]",
+          "bgpPeeringAddress": "[last(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway1Name'))).bgpSettings.bgpPeeringAddress , ','))]",
+          "peerWeight": 0
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "name": "[variables('connection1Name1')]",
+      "apiVersion": "2019-06-01",
+      "comments": "VPN connection between [Gateway1] and [Gateway2-pubIP1]",
+      "location": "[variables('location1')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway1Name1'))]"
+      ],
+      "properties": {
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway1Name'))]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway1Name1'))]"
+        },
+        "connectionType": "IPsec",
+        "routingWeight": 0,
+        "sharedKey": "[variables('sharedKey')]",
+        "enableBGP": "true"
+      }
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "name": "[variables('connection1Name2')]",
+      "apiVersion": "2019-06-01",
+      "comments": "VPN connection between [Gateway1] and [Gateway2-pubIP2]",
+      "location": "[variables('location1')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway1Name2'))]"
+      ],
+      "properties": {
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway1Name'))]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway1Name2'))]"
+        },
+        "connectionType": "IPsec",
+        "routingWeight": 0,
+        "sharedKey": "[variables('sharedKey')]",
+        "enableBGP": "true"
+      }
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "name": "[variables('connection2Name1')]",
+      "apiVersion": "2019-06-01",
+      "comments": "VPN connection between [Gateway2] and [Gateway1-pubIP1]",
+      "location": "[variables('location2')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway2Name1'))]"
+      ],
+      "properties": {
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway2Name'))]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway2Name1'))]"
+        },
+        "connectionType": "IPsec",
+        "routingWeight": 0,
+        "sharedKey": "[variables('sharedKey')]",
+        "enableBGP": "true"
+      }
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "name": "[variables('connection2Name2')]",
+      "apiVersion": "2019-06-01",
+      "comments": "VPN connection between [Gateway2] and [Gateway1-pubIP2]",
+      "location": "[variables('location2')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway2Name2'))]"
+      ],
+      "properties": {
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway2Name'))]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localGateway2Name2'))]"
+        },
+        "connectionType": "IPsec",
+        "routingWeight": 0,
+        "sharedKey": "[variables('sharedKey')]",
+        "enableBGP": "true"
+      }
+    }
+],
+"outputs": {
+  "gtw1PublicIPAddress1": {
+    "type":"string",
+    "value" : "[variables('gateway1PubIP1')]" 
+  },
+  "gtw1PublicIPAddress2": {
+    "type":"string",
+    "value" : "[variables('gateway1PubIP2')]" 
+  }
+}
+}
+}
+},
+
+
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('vm1PublicIPName')]",
+      "apiVersion": "2019-09-01",
+      "location": "[variables('location1')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('vm2PublicIPName')]",
+      "apiVersion": "2019-09-01",
+      "location": "[variables('location2')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nic1Name')]",
+      "apiVersion": "2019-09-01",
+      "location": "[variables('location1')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('vm1PublicIPName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNet1Name'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vm1PublicIPName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnet1Ref')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nic2Name')]",
+      "apiVersion": "2019-09-01",
+      "location": "[variables('location2')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('vm2PublicIPName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNet2Name'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig2",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vm2PublicIPName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnet2Ref')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('vm1Name')]",
+      "apiVersion": "2019-03-01",
+      "location": "[variables('location1')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('nic1Name'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vm1Name')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('vm1Name'),'-OSdisk')]",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "[variables('storageAccountType')]"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nic1Name'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('vm2Name')]",
+      "apiVersion": "2019-03-01",
+      "location": "[variables('location2')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('nic2Name'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vm2Name')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('vm2Name'),'-OSdisk')]",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "[variables('storageAccountType')]"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nic2Name'))]"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
