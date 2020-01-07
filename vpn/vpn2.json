@@ -4,35 +4,30 @@
   "parameters": {
     "location1": {
       "type": "string",
-      "defaultValue": "eastus",
       "metadata": {
         "description": "Azure region"
       }
     },
     "location2": {
       "type": "string",
-      "defaultValue": "eastus",
       "metadata": {
         "description": "Azure region"
       }
     },
     "gateway1PublicIP1Name": {
       "type": "string",
-      "defaultValue": "vpnGw1IP1",
       "metadata": {
         "description": "Arbitrary name for public IP1 resource used for the new azure gateway1"
       }
     },
     "gateway2PublicIP1Name": {
       "type": "string",
-      "defaultValue": "vpnGw2IP1",
       "metadata": {
         "description": "Arbitrary name for public IP1 resource used for the new azure gateway2"
       }
     },
     "gateway1PublicIP2Name": {
       "type": "string",
-      "defaultValue": "vpnGw1IP2",
       "metadata": {
         "description": "Arbitrary name for public IP2 resource used for the new azure gateway1"
       }
