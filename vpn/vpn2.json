@@ -99,41 +99,6 @@
       "metadata": {
         "description": "BGP Autonomous System Number of the remote VNet"
       }
-    },
-    "connection1Name1": {
-      "type": "string",
-      "defaultValue": "gtw1-to-gtw2-1",
-      "metadata": {
-        "description": "Arbitrary name for the new connection between Azure VNet and other network"
-      }
-    },
-    "connection1Name2": {
-      "type": "string",
-      "defaultValue": "gtw1-to-gtw2-2",
-      "metadata": {
-        "description": "Arbitrary name for the new connection between Azure VNet and other network"
-      }
-    },
-    "connection2Name1": {
-      "type": "string",
-      "defaultValue": "gtw2-to-gtw1-1",
-      "metadata": {
-        "description": "Arbitrary name for the new connection between Azure VNet and other network"
-      }
-    },
-    "connection2Name2": {
-      "type": "string",
-      "defaultValue": "gtw2-to-gtw1-2",
-      "metadata": {
-        "description": "Arbitrary name for the new connection between Azure VNet and other network"
-      }
-    },
-    "sharedKey": {
-      "type": "string",
-      "defaultValue": "secretPSK-101",
-      "metadata": {
-        "description": "Shared key (PSK) for IPSec tunnel"
-      }
     }
   },
   "variables": {
@@ -150,12 +115,8 @@
     "gateway2PublicIP1Name": "[parameters('gateway2PublicIP1Name')]",
     "gateway2PublicIP2Name": "[parameters('gateway2PublicIP2Name')]",
     "asnGtw1": "[parameters('asnGtw1')]",
-    "asnGtw2": "[parameters('asnGtw2')]",
-    "connection1Name1": "[parameters('connection1Name1')]",
-    "connection1Name2": "[parameters('connection1Name2')]",
-    "connection2Name1": "[parameters('connection2Name1')]",
-    "connection2Name2": "[parameters('connection2Name2')]",
-    "sharedKey": "[parameters('sharedKey')]"
+    "asnGtw2": "[parameters('asnGtw2')]"
+
   },
   "resources": [
     {
