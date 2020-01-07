@@ -110,6 +110,7 @@
       "apiVersion": "2019-06-01",
       "comments": "public IP of remote IPSec peer",
       "location": "[variables('location1')]",
+      "dependsOn": [],
       "properties": {
         "gatewayIpAddress": "[reference(variables('gateway2PublicIP1Id')).ipAddress]",
         "bgpSettings": {
@@ -125,6 +126,7 @@
       "apiVersion": "2019-06-01",
       "comments": "public IP of remote IPSec peer",
       "location": "[variables('location1')]",
+      "dependsOn": [],
       "properties": {
         "gatewayIpAddress": "[reference(variables('gateway2PublicIP2Id')).ipAddress]",
         "bgpSettings": {
@@ -140,9 +142,7 @@
       "apiVersion": "2019-06-01",
       "comments": "public IP of remote IPSec peer",
       "location": "[variables('location2')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses',variables('gateway1PublicIP1Name'))]"
-      ],
+      "dependsOn": [],
       "properties": {
         "gatewayIpAddress": "[reference(variables('gateway1PublicIP1Id')).ipAddress]",
         "bgpSettings": {
