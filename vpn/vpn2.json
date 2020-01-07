@@ -111,7 +111,7 @@
       "comments": "public IP of remote IPSec peer",
       "location": "[variables('location1')]",
       "properties": {
-        "gatewayIpAddress": "[reference(variables('gateway2PublicIP1Name')).ipAddress]",
+        "gatewayIpAddress": "[reference(variables('gateway2PublicIP1Id')).ipAddress]",
         "bgpSettings": {
           "asn": "[variables('asnGtw2')]",
           "bgpPeeringAddress": "[first(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway2Name'))).bgpSettings.bgpPeeringAddress , ','))]",
@@ -126,7 +126,7 @@
       "comments": "public IP of remote IPSec peer",
       "location": "[variables('location1')]",
       "properties": {
-        "gatewayIpAddress": "[reference(variables('gateway2PublicIP2Name')).ipAddress]",
+        "gatewayIpAddress": "[reference(variables('gateway2PublicIP2Id')).ipAddress]",
         "bgpSettings": {
           "asn": "[variables('asnGtw2')]",
           "bgpPeeringAddress": "[last(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway2Name'))).bgpSettings.bgpPeeringAddress , ','))]",
@@ -144,7 +144,7 @@
         "[resourceId('Microsoft.Network/publicIPAddresses',variables('gateway1PublicIP1Name'))]"
       ],
       "properties": {
-        "gatewayIpAddress": "[reference(variables('gateway1PublicIP1Name')).ipAddress]",
+        "gatewayIpAddress": "[reference(variables('gateway1PublicIP1Id')).ipAddress]",
         "bgpSettings": {
           "asn": "[variables('asnGtw1')]",
           "bgpPeeringAddress": "[first(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway1Name'))).bgpSettings.bgpPeeringAddress , ','))]",
@@ -159,7 +159,7 @@
       "comments": "public IP of remote IPSec peer",
       "location": "[variables('location2')]",
       "properties": {
-        "gatewayIpAddress": "[reference(variables('gateway2PublicIP2Name')).ipAddress]",
+        "gatewayIpAddress": "[reference(variables('gateway2PublicIP2Id')).ipAddress]",
         "bgpSettings": {
           "asn": "[variables('asnGtw1')]",
           "bgpPeeringAddress": "[last(split( reference(resourceId('Microsoft.Network/virtualNetworkGateways',variables('gateway1Name'))).bgpSettings.bgpPeeringAddress , ','))]",
