@@ -32,16 +32,16 @@
         "description": "Arbitrary name for public IP1 resource used for the new azure gateway1"
       }
     },
-    "gateway2PublicIP1Id": {
-      "type": "string",
-      "metadata": {
-        "description": "Arbitrary name for public IP1 resource used for the new azure gateway2"
-      }
-    },
     "gateway1PublicIP2Id": {
       "type": "string",
       "metadata": {
         "description": "Arbitrary name for public IP2 resource used for the new azure gateway1"
+      }
+    },
+    "gateway2PublicIP1Id": {
+      "type": "string",
+      "metadata": {
+        "description": "Arbitrary name for public IP1 resource used for the new azure gateway2"
       }
     },
     "gateway2PublicIP2Id": {
